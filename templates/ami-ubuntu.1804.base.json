@@ -1,0 +1,74 @@
+{
+    "variables": {
+      "aws_region": "{{ env `AWS_DEFAULT_REGION` }}",
+      "aws_subnet_id": "{{ env `AWS_PACKER_SUBNET` }}",
+      "aws_vpc_id": "{{ env `AWS_VPC_ID` }}",
+      "tag_user": "{{ env `USER` }}",
+      "tag_build_url": "{{ env `BUILD_URL` }}",
+      "tag_build_tag": "{{ env `BUILD_TAG` }}"
+    },
+    "builders": [
+      {
+        "type": "amazon-ebs",
+        "region": "{{user `aws_region`}}",
+        "subnet_id": "{{user `aws_subnet_id`}}",
+        "vpc_id": "{{user `aws_vpc_id`}}",
+        "source_ami_filter": {
+          "filters": {
+            "virtualization-type": "hvm",
+            "name": "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server*",
+            "root-device-type": "ebs"
+          },
+          "owners": [
+            "099720109477"
+          ],
+          "most_recent": true
+        },
+        "instance_type": "t2.small",
+        "iam_instance_profile": "Packer",
+        "ssh_username": "ubuntu",
+        "associate_public_ip_address": "true",
+        "ami_name": "ubuntu-1804-base-{{timestamp}}",
+        "run_tags": {
+          "Name": "packer-base-1804",
+          "user": "{{user `tag_user`}}",
+          "build-url": "{{user `tag_build_url`}}",
+          "build-tag": "{{user `tag_build_tag`}}"
+        },
+        "tags": {
+          "Name": "base",
+          "build-url": "{{user `tag_build_url`}}",
+          "build-tag": "{{user `tag_build_tag`}}"
+        }
+      }
+    ],
+    "provisioners": [
+      {
+        "type": "file",
+        "source": "files",
+        "destination": "/tmp/files/"
+      },
+      {
+        "type": "shell",
+        "execute_command": "sudo -H -E bash '{{ .Path }}'",
+        "inline": [
+          "mkdir -p /packer/scripts",
+          "chown -R ubuntu /packer"
+        ]
+      },
+      {
+        "type": "file",
+        "source": "scripts",
+        "destination": "/packer"
+      },
+      {
+        "type": "shell",
+        "remote_path": "/packer/provision.sh",
+        "inline": [
+          "export DEBIAN_FRONTEND=noninteractive",
+          "sudo run-parts --exit-on-error /packer/scripts",
+          "sudo rm -rf /packer"
+        ]
+      }
+    ]
+  }

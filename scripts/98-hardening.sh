@@ -1,0 +1,256 @@
+#!/bin/bash
+set -eux
+
+# This is a shell script until it gets too complex
+
+# Remove packages
+apt-get purge -q -y --allow-remove-essential \
+  apport                \
+  at                    \
+  binutils              \
+  cpp                   \
+  cpp-5                 \
+  fuse                  \
+  gcc                   \
+  gcc-5                 \
+  git                   \
+  iptables              \
+  lxc-common            \
+  man-db                \
+  mlocate               \
+  nano                  \
+  open-iscsi            \
+  pastebinit            \
+  plymouth              \
+  popularity-contest    \
+  screen                \
+  telnet                \
+  ubuntu-mono           \
+  wget
+apt-get -y dist-upgrade
+
+# Remove all leftovers automatically installed packages
+apt-get autoremove -q -y --purge
+
+# Set sysctls
+echo "fs.suid_dumpable = 0" > /etc/sysctl.conf
+echo "net.ipv4.conf.default.send_redirects = 0" >> /etc/sysctl.conf
+echo "net.ipv4.conf.all.send_redirects = 0" >> /etc/sysctl.conf
+echo "net.ipv4.ip_forward = 0" >> /etc/sysctl.conf
+echo "net.ipv4.conf.all.accept_source_route = 0" >> /etc/sysctl.conf
+echo "net.ipv4.conf.all.log_martians = 1" >> /etc/sysctl.conf
+echo "net.ipv4.conf.all.accept_redirects = 0" >> /etc/sysctl.conf
+echo "net.ipv4.conf.all.secure_redirects = 0" >> /etc/sysctl.conf
+echo "net.ipv4.conf.default.accept_source_route = 0" >> /etc/sysctl.conf
+echo "net.ipv4.conf.default.log_martians = 1" >> /etc/sysctl.conf
+echo "net.ipv4.conf.default.accept_redirects = 0" >> /etc/sysctl.conf
+echo "net.ipv4.conf.default.secure_redirects = 0" >> /etc/sysctl.conf
+echo "net.ipv4.icmp_echo_ignore_broadcasts = 1" >> /etc/sysctl.conf
+echo "net.ipv4.icmp_ignore_bogus_error_responses = 1" >> /etc/sysctl.conf
+echo "net.ipv4.tcp_syncookies = 1" >> /etc/sysctl.conf
+echo "net.ipv4.tcp_timestamps = 0" >> /etc/sysctl.conf
+echo "net.ipv4.conf.all.rp_filter = 1" >> /etc/sysctl.conf
+echo "net.ipv4.conf.default.rp_filter = 1" >> /etc/sysctl.conf
+echo "kernel.randomize_va_space = 2" >> /etc/sysctl.conf
+echo "kernel.core_uses_pid = 1" >> /etc/sysctl.conf
+echo "kernel.kptr_restrict = 2" >> /etc/sysctl.conf
+echo "kernel.sysrq = 0" >> /etc/sysctl.conf
+echo "kernel.dmesg_restrict = 1" >> /etc/sysctl.conf
+
+sysctl -p /etc/sysctl.conf
+
+# Set permissions
+chmod 700 /home/*
+
+# Disable kernel modules
+echo "install cramfs /bin/false" > /etc/modprobe.d/cramfs.conf
+echo "install freevxfs /bin/false" > /etc/modprobe.d/freevxfs.conf
+echo "install jffs2 /bin/false" > /etc/modprobe.d/jffs2.conf
+echo "install hfs /bin/false" > /etc/modprobe.d/hfs.conf
+echo "install hfsplus /bin/false" > /etc/modprobe.d/hfsplus.conf
+echo "install squashfs /bin/false" > /etc/modprobe.d/squashfs.conf
+echo "install udf /bin/false" > /etc/modprobe.d/udf.conf
+echo "install libiscsi /bin/false" > /etc/modprobe.d/libiscsi.conf
+echo "install psmouse /bin/false" > /etc/modprobe.d/psmouse.conf
+echo "install parport /bin/false" > /etc/modprobe.d/parport.conf
+echo "install isofs /bin/false" > /etc/modprobe.d/isofs.conf
+echo "install bluetooth /bin/false" > /etc/modprobe.d/bluetooth.conf
+echo "install net-pf-31 /bin/false" > /etc/modprobe.d/net-pf-31.conf
+echo "install dccp /bin/false" > /etc/modprobe.d/dccp.conf
+echo "install sctp /bin/false" > /etc/modprobe.d/sctp.conf
+echo "install rds /bin/false" > /etc/modprobe.d/rds.conf
+echo "install tipc /bin/false" > /etc/modprobe.d/tipc.conf
+#rm /lib/modules-load.d/open-iscsi.conf
+
+
+#Update initrd with changes
+update-initramfs -k all -u
+# SSH settings
+rm -f /etc/ssh/authorized_keys
+touch /etc/ssh/authorized_keys
+chown root:root /etc/ssh/authorized_keys
+chmod 0600 /etc/ssh/authorized_keys
+
+echo "" >> /etc/ssh/sshd_config
+echo "AllowAgentForwarding no" >> /etc/ssh/sshd_config
+echo "Compression no" >> /etc/ssh/sshd_config
+echo "MaxAuthTries 2" >> /etc/ssh/sshd_config
+echo "MaxSessions 2" >> /etc/ssh/sshd_config
+echo "UseDNS no" >> /etc/ssh/sshd_config
+echo "Protocol 2" >> /etc/ssh/sshd_config
+echo "AuthorizedKeysFile /etc/ssh/authorized_keys" >> /etc/ssh/sshd_config
+sed -i 's/^#LogLevel .*/LogLevel VERBOSE/' /etc/ssh/sshd_config
+sed -i 's/^#PermitRootLogin .*/PermitRootLogin no/' /etc/ssh/sshd_config
+sed -i 's/^#TCPKeepAlive .*/TCPKeepAlive no/' /etc/ssh/sshd_config
+sed -i 's/^X11Forwarding .*/X11Forwarding no/' /etc/ssh/sshd_config
+sed -i 's/^#PermitEmptyPasswords .*/PermitEmptyPasswords no/' /etc/ssh/sshd_config
+
+# Disable core dumps
+echo "*     hard   core    0" >> /etc/security/limits.conf
+
+# Prevent direct root login
+:> /etc/securetty
+
+# Set umask
+sed -i  's/UMASK.*022/UMASK 077/' /etc/login.defs
+
+# Remove Snap dirs from paths
+# rm -Rf /snap
+#sed -i 's#:/snap/bin##' /etc/sudoers
+
+#rm -f /etc/profile.d/apps-bin-path.sh If we do this ssm-agent will be removed this is a no go for us
+
+# Login banner
+echo "Unauthorised access to this computer system may constitute a criminal offence" > /etc/issue
+echo "under the Computer Misuse Act 1990" >> /etc/issue
+echo "Do not proceed unless authorised."  >> /etc/issue
+
+echo 'none     /tmp        tmpfs    rw,nodev,noexec,nosuid 0 0' >> /etc/fstab
+echo '/tmp     /var/tmp     none     rw,nodev,noexec,nosuid,bind     0 0' >> /etc/fstab
+echo 'none /dev/shm tmpfs rw,nosuid,nodev,noexec 0 0' >> /etc/fstab
+
+# Ensure sticky bit on all directories
+df --local -P | awk {'if (NR!=1) print $6'} \
+| xargs -I '{}' find '{}' -xdev -type d \
+\( -perm -0002 -a ! -perm -1000 \) 2>/dev/null \
+| xargs -r chmod a+t
+
+#######################
+# CIS benchmarks      #
+#######################
+
+# CIS_Distribution_Independent_Linux_Benchmark_v1.1.0
+## 3.3.1: Ensure IPv6 router advertisements are not accepted
+echo "net.ipv6.conf.all.accept_ra = 0" >> /etc/sysctl.d/10-network-security.conf
+echo "net.ipv6.conf.default.accept_ra = 0" >> /etc/sysctl.d/10-network-security.conf
+
+## 3.3.3: Ensure IPv6 is disabled
+sed -i 's/GRUB_CMDLINE_LINUX=.*/GRUB_CMDLINE_LINUX="ipv6.disable=1"/g' /etc/default/grub
+update-grub
+
+## 5.1.2: Ensure permissions on /etc/crontab are configured
+chown root:root /etc/crontab
+chmod og-rwx /etc/crontab
+
+## 5.1.3: Ensure permissions on /etc/cron.hourly are configured
+chown root:root /etc/cron.hourly
+chmod og-rwx /etc/cron.hourly
+
+## 5.1.4: Ensure permissions on /etc/cron.daily are configured
+chown root:root /etc/cron.daily
+chmod og-rwx /etc/cron.daily
+
+## 5.1.5: Ensure permissions on /etc/cron.weekly are configured
+chown root:root /etc/cron.weekly
+chmod og-rwx /etc/cron.weekly
+
+## 5.1.6: Ensure permissions on /etc/cron.monthly are configured
+chown root:root /etc/cron.monthly
+chmod og-rwx /etc/cron.monthly
+
+## 5.1.7: Ensure permissions on /etc/cron.d are configured
+chown root:root /etc/cron.d
+chmod og-rwx /etc/cron.d
+
+## 5.1.8: Ensure at/cron is restricted to authorized users
+rm -f /etc/cron.deny
+rm -f /etc/at.deny
+touch /etc/cron.allow
+touch /etc/at.allow
+chmod og-rwx /etc/cron.allow
+chmod og-rwx /etc/at.allow
+chown root:root /etc/cron.allow
+chown root:root /etc/at.allow
+
+## 5.2.1: Ensure permissions on /etc/ssh/sshd_config are configured
+chown root:root /etc/ssh/sshd_config
+chmod og-rwx /etc/ssh/sshd_config
+
+## 5.2.3: Ensure SSH LogLevel is set to INFO
+sudo sed -i 's/.*LogLevel .*/LogLevel INFO/g' /etc/ssh/sshd_config
+
+## 5.2.6: Ensure SSH IgnoreRhosts is enabled
+sudo sed -i 's/.*IgnoreRhosts .*/IgnoreRhosts yes/g' /etc/ssh/sshd_config
+
+## 5.2.7: Ensure SSH HostbasedAuthentication is disabled
+sudo sed -i 's/.*HostbasedAuthentication .*/HostbasedAuthentication no/g' /etc/ssh/sshd_config
+
+## 5.2.10: Ensure SSH PermitUserEnvironment is disabled
+sudo sed -i 's/.*PermitUserEnvironment .*/PermitUserEnvironment no/g' /etc/ssh/sshd_config
+
+## 5.2.11: Ensure only approved ciphers are used
+echo -e "\nCiphers aes256-ctr,aes192-ctr,aes128-ctr" >> /etc/ssh/sshd_config
+
+## 5.2.12: Ensure only approved MAC algorithms are used
+echo "MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,umac-128@openssh.com" >> /etc/ssh/sshd_config
+
+## 5.2.13: Ensure SSH Idle Timeout Interval is configured
+sudo sed -i 's/.*ClientAliveInterval .*/ClientAliveInterval 300/g' /etc/ssh/sshd_config
+sudo sed -i 's/.*ClientAliveCountMax .*/ClientAliveCountMax 0/g' /etc/ssh/sshd_config
+
+## 5.2.14: Ensure SSH LoginGraceTime is set to one minute or less
+sudo sed -i 's/.*LoginGraceTime .*/LoginGraceTime 60/g' /etc/ssh/sshd_config
+
+## 5.2.16: Ensure SSH warning banner is configuredi
+sudo sed -i 's/.*Banner .*/Banner \/etc\/issue.net/g' /etc/ssh/sshd_config
+
+## 5.3.3 Ensure password reuse is limited (Not Scored)
+sed -i '/pam_unix.so/ s/$/ remember=5/' /etc/pam.d/common-password
+echo "password required pam_pwhistory.so remember=5" >> /etc/pam.d/common-password
+
+## 5.4.1.1: Ensure password expiration is 90 days or less
+sed  -i 's/^PASS_MAX_DAYS.*/PASS_MAX_DAYS   90/g' /etc/login.defs
+
+## 5.4.1.2: Ensure minimum days between password changes is 7 or more
+sed  -i 's/^PASS_MIN_DAYS.*/PASS_MIN_DAYS   7/g' /etc/login.defs
+
+## 5.4.1.4: Ensure inactive password lock is 30 days or less
+useradd -D -f 30
+
+## 5.4.4: Ensure default user umask is 027 or more restrictive
+echo "umask 077" >> /etc/bash.bashrc
+echo "umask 077" >> /etc/profile
+
+## 5.6: Ensure access to the su command is restricted
+echo auth required pam_wheel.so use_uid >> /etc/pam.d/su
+
+## 6.1.6: Ensure permissions on /etc/passwd- are configured
+chown root:root /etc/passwd-
+chmod 0600 /etc/passwd-
+
+## 6.1.7: Ensure permissions on /etc/shadow- are configured
+chown root:shadow /etc/shadow-
+chmod 0600 /etc/shadow-
+
+## 6.1.8: Ensure permissions on /etc/group- are configured
+chown root:root /etc/group-
+chmod 0600 /etc/group-
+
+## 6.1.9: Ensure permissions on /etc/gshadow- are configured
+chown root:shadow /etc/gshadow-
+chmod 0600 /etc/gshadow-
+
+
+# CIS_Ubuntu_Linux_18.04_LTS_Benchmark_v1.0.0
+## 5.3.1 Ensure password creation requirements are configured
+## To be implemented in the future, currently we don't use user passwords
