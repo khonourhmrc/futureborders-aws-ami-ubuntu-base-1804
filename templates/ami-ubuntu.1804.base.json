@@ -44,31 +44,8 @@
     ],
     "provisioners": [
       {
-        "type": "file",
-        "source": "files",
-        "destination": "/tmp/files/"
-      },
-      {
         "type": "shell",
-        "execute_command": "sudo -H -E bash '{{ .Path }}'",
-        "inline": [
-          "mkdir -p /packer/scripts",
-          "chown -R ubuntu /packer"
-        ]
-      },
-      {
-        "type": "file",
-        "source": "scripts",
-        "destination": "/packer"
-      },
-      {
-        "type": "shell",
-        "remote_path": "/packer/provision.sh",
-        "inline": [
-          "export DEBIAN_FRONTEND=noninteractive",
-          "sudo run-parts --exit-on-error /packer/scripts",
-          "sudo rm -rf /packer"
-        ]
+        "script": "configure_machine.sh"
       }
     ]
   }

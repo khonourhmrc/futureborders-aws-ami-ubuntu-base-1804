@@ -1,0 +1,13 @@
+#!/bin/bash
+set -uex
+
+FILES=/tmp/files
+
+for logrotate_file in $( ls ${FILES}/logrotate/ ); do
+    install --owner root --group root --mode 0644 \
+    ${FILES}/logrotate/${logrotate_file}          \
+    /etc/logrotate.d/${logrotate_file}
+done
+
+# move logrotate from daily to hourly
+mv /etc/cron.daily/logrotate /etc/cron.hourly/logrotate

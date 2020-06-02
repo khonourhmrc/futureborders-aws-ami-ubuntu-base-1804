@@ -1,0 +1,48 @@
+#!/bin/bash
+set -uex
+
+FILES=/tmp/files
+
+apt-get -y install collectd-core collectd-utils
+# Installed from mdtp-internal-apt
+apt-get -y install collectd=5.8.0.132.g0684aea-3~bionic
+
+install --owner root --group root --mode 0755 -d \
+    /etc/collectd/collectd.conf.d/
+
+for file in ${FILES}/collectd/conf/collectd.conf.d/*;do
+    install --owner root --group root --mode 0644 "$file" /etc/collectd/collectd.conf.d
+done
+
+install --owner root --group root --mode 0644      \
+    ${FILES}/collectd/conf/collectd.conf.tpl       \
+    /etc/collectd/collectd.conf.tpl
+
+install --owner root --group root -d               \
+    /usr/share/collectd/mdtp_scripts
+
+install --owner root --group root --mode 0755      \
+    ${FILES}/collectd/sbin/collectd-pre.sh         \
+    /usr/local/sbin/collectd-pre.sh
+
+install --owner root --group root --mode 0644      \
+    ${FILES}/collectd/systemd/collectd-pre.service \
+    /etc/systemd/system/collectd-pre.service
+
+install --owner root --group root --mode 0755      \
+    ${FILES}/collectd/iostat.sh                    \
+    /usr/share/collectd/mdtp_scripts/iostat.sh
+
+chown -R root:root /etc/collectd/*
+
+for file in $( find /etc/collectd -type f );do
+    chmod 644 "${file}"
+done
+
+for file in $( find /etc/collectd -type d );do
+    chmod 755 "${file}"
+done
+
+systemctl enable collectd-pre.service
+systemctl disable collectd.service
+systemctl add-wants ready.target collectd.service

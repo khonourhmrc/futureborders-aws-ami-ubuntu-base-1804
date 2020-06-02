@@ -5,3 +5,5 @@ set -uexo pipefail
 sudo find /var/log -type f -delete
 
 # Don't remove snappy package manager because ssm agent is installed using it.
+
+sudo apt autoremove -y

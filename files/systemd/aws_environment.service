@@ -1,0 +1,12 @@
+[Unit]
+Description="Populate systemd global environment variables from AWS tags"
+After=aws_tags.service
+After=cloud-init.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/aws_environment/virtualenv/bin/python /opt/aws_environment/aws_environment.py
+ExecStartPost=/bin/systemctl daemon-reload
+
+[Install]
+RequiredBy=aws.target

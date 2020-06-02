@@ -1,0 +1,12 @@
+[Unit]
+Description=A service to configure collectd
+After=aws.target
+Before=collectd.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/collectd-pre.sh
+StandardOutput=journal
+
+[Install]
+WantedBy=collectd.service

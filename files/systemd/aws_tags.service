@@ -1,0 +1,12 @@
+[Unit]
+Description="Verify that AWS tags have been applied to the instance"
+BindsTo=network-online.target
+After=network-online.target
+Before=cloud-final.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c 'while ! [ $(aws ec2 describe-tags --filters Name=resource-id,Values=$(curl -fs http://169.254.169.254/latest/meta-data/instance-id) --region=eu-west-2 --output text --query Tags[*].Key | wc -w) -ne "0" ]; do logger "[aws_tags] Waiting for tags to be applied ..."; sleep 5; done'
+
+[Install]
+RequiredBy=aws.target

@@ -1,0 +1,12 @@
+[Unit]
+Description=A service to generate logstash filters from template
+After=aws.target
+Before=logstash.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/logstash-pre.sh $AWS_TAG_NAME $AWS_AVAILABILITY_ZONE
+StandardOutput=journal
+
+[Install]
+WantedBy=ready.target

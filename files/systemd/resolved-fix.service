@@ -1,0 +1,13 @@
+[Unit]
+Description=A service to generate custom systemd-resolved config from template
+After=aws.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/resolved-fix.sh $AWS_TAG_ENV
+ExecStartPost=/bin/systemctl restart systemd-resolved
+
+StandardOutput=journal
+
+[Install]
+WantedBy=ready.target

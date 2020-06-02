@@ -1,0 +1,19 @@
+#!/bin/bash
+set -ex
+
+FILES=/tmp/files
+
+INSTALL_PATH=/opt/aws_environment
+
+mkdir -p "$INSTALL_PATH"
+mkdir -p /etc/systemd/system.conf.d
+
+install --owner root --group root --mode 0755 \
+    "${FILES}/aws_environment/aws_environment.py" "$INSTALL_PATH"
+
+virtualenv -p "$(which python3)" "$INSTALL_PATH/virtualenv"
+source "$INSTALL_PATH/virtualenv/bin/activate"
+
+pip install --no-cache-dir boto3 requests
+
+deactivate

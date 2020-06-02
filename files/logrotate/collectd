@@ -1,0 +1,9 @@
+/var/log/collectd.json.log {
+  compress
+  copytruncate
+  missingok
+  notifempty
+  daily
+  rotate 7
+  size 50M
+}

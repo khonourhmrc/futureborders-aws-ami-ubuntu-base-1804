@@ -1,0 +1,13 @@
+name: cis
+title: InSpec Profile for CIS hardening
+maintainer: Infrastructure team
+copyright: Infrastructure team
+copyright_email: slack@infra-internal 
+license: Apache-2.0
+summary: An InSpec Compliance Profile for CIS Distribution Independent Linux, Benchmark v1.1.0
+version: 1.1.0
+supports:
+  - platform-name: ubuntu
+depends:
+  - name: cis-dil-benchmark
+    path: test/integration/cis-dil-benchmark

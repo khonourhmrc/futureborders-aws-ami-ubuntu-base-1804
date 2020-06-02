@@ -1,0 +1,7 @@
+[Unit]
+Description="AWS stuff is ready"
+BindsTo=network.target
+After=network.target
+
+[Install]
+WantedBy=ready.target
