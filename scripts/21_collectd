@@ -4,8 +4,12 @@ set -uex
 FILES=/tmp/files
 
 apt-get -y install collectd-core collectd-utils
+
 # Installed from mdtp-internal-apt
-apt-get -y install collectd=5.8.0.132.g0684aea-3~bionic
+
+#we can't get this as its non standard falling back to provided implementation from bionic
+#apt-get -y install collectd=5.8.0.132.g0684aea-3~bionic FIXME, would like to find out why they built this
+apt-get -y install collectd
 
 install --owner root --group root --mode 0755 -d \
     /etc/collectd/collectd.conf.d/
