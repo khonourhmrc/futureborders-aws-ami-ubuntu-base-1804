@@ -5,7 +5,7 @@ env.PACKER_LOG = 1
 env.PACKER_LOG_PATH = "${env.BUILD_TARGET}/packer.log"
 env.TEST_KITCHEN_IAM_GROUPS = 'ssh_only'
 env.TEST_KITCHEN_SSH_KEY = '/var/lib/jenkins/.ssh/test_kitchen_id_rsa'
-env.BUCKET_NAME = "management-hardening-outputs-0895714cd6a761f53154bff0f2efce28"
+env.BUCKET_NAME = "management-hardening-outputs-135D840E-100B-4C34-8CA0-C3E3B00987D6"
 
 //node ('amislave') {
 node ('master') {
