@@ -1,0 +1,107 @@
+---
+driver:
+  name: ec2
+  subnet_id: <%= ENV['AWS_SUBNET_ID'] %>
+  security_group_filter:
+    tag: Name
+    value: test-kitchen
+
+transport:
+  username: <%= ENV['TEST_KITCHEN_USER'] || 'test-kitchen' %>
+  <% if ENV['TEST_KITCHEN_SSH_KEY'] %>
+  ssh_key: <%= ENV['TEST_KITCHEN_SSH_KEY'] %>
+  <% end %>
+
+provisioner:
+  name: shell
+  root_path: bootstrap.sh
+  script: test/scripts/bootstrap.sh
+
+platforms:
+  - name: ubuntu-18.04
+    driver:
+      region: <%= ENV['AWS_DEFAULT_REGION'] %>
+      associate_public_ip: true
+      instance_type: t2.small
+      image_id: <%= ENV['TEST_KITCHEN_AMI'] %>
+      iam_profile_name: TestKitchen
+      tags:
+        Name: test-kitchen-1804-base
+        Env: <%= ENV['AWS_ENVIRONMENT'] %>
+        iam-groups: <%= ENV['TEST_KITCHEN_IAM_GROUPS'] || 'webops_engineer' %>
+        auth-account-arn: arn:aws:iam::638924580364:role/RoleCrossAccountSSH
+        user: <%= ENV['USER'] %>
+        <% if ENV['BUILD_URL'] %>
+        build-url: <%= ENV['BUILD_URL'] %>
+        build-tag: <%= ENV['BUILD_TAG'] %>
+        <% end %>
+
+suites:
+  - name: cis
+    verifier:
+      name: inspec
+      <% if ENV['JUNIT_XML'] %>
+      format: junit
+      output: <%= ENV['JUNIT_XML'] %>
+      <% end %>
+      attributes:
+        cis_level: "1"
+
+  - name: inspec
+    verifier:
+      name: inspec
+      <% if ENV['JUNIT_XML'] %>
+      format: junit
+      output: <%= ENV['JUNIT_XML'] %>
+      <% end %>
+
+  - name: lynis
+    verifier:
+      name: shell
+      command: sudo lynis audit system --profile /etc/lynis/base-ami.prf
+      remote_exec: true
+    driver:
+      user_data: |
+        #cloud-config
+        package_update: false
+        write_files:
+          - content: |
+              Package: lynis
+              Pin: origin packages.cisofy.com
+              Pin-Priority: 600
+            path: /etc/apt/preferences.d/lynis
+          - content: |
+              error-on-warnings=yes
+              quick=yes
+              skip-test=NETW-2705
+              skip-test=BOOT-5122
+              skip-test=AUTH-9262
+              skip-test=AUTH-9328
+              skip-test=FILE-6310
+              skip-test=STRG-1840
+              skip-test=NAME-4404
+              skip-test=PKGS-7370
+              skip-test=PKGS-7394
+              skip-test=NETW-3032
+              skip-test=FIRE-4590
+              skip-test=SSH-7408
+              skip-test=BANN-7126
+              skip-test=BANN-7130
+              skip-test=ACCT-9622
+              skip-test=ACCT-9626
+              skip-test=ACCT-9628
+              skip-test=FINT-4350
+              skip-test=TOOL-5002
+              skip-test=HRDN-7230
+            path: /etc/lynis/base-ami.prf
+        apt:
+          preserve_sources_list: true
+          sources:
+            lynis.list:
+              source: "deb https://packages.cisofy.com/community/lynis/deb/ xenial main"
+              keyid: C80E383C3DE9F082E01391A0366C67DE91CA5D5F
+              filename: lynis.list
+        packages:
+          - lynis
+        runcmd:
+          - [ lynis, update, info ]
