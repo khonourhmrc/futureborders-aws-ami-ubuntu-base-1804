@@ -135,28 +135,7 @@ def PostTests(){
 
 def generateLaunchPermissionArray() {
   def user_ids = [
-    '638924580364', // Users
-    '370807233099', // Sandbox
-    '248771275994', // QA
-    '186795391298', // Staging
-    '970278273631', // External Test
-    '490818658393', // Production
-    '419929493928', // Management
-    '150648916438', // Integration
-    '618259438944', // Development
-    '421310561273', // Telemetry
-    '634456480543', // Telemetry-base
-    '865454780587', // TxM Sandbox
-    '727065427295', // TxM Tools
-    '248233750935', // TxM QA
-    '126431277821', // TxM Staging
-    '561322004601', // TxM Production
-    '597819041397', // TxM Prod mgmt
-    '063874132475', // Upscan Labs
-    '415042754718', // Upscan Live
-    '253238601924', // DDCOps Management
-    '800758666678', // DDCOps Sandbox
-    '508384829422', // Apprentice Sandbox
+    '236048907885', // Users
   ]
 
   def list = ""
