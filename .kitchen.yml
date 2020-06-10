@@ -28,7 +28,7 @@ platforms:
       tags:
         Name: test-kitchen-1804-base
         Env: <%= ENV['AWS_ENVIRONMENT'] %>
-        iam-groups: <%= ENV['TEST_KITCHEN_IAM_GROUPS'] || 'webops_engineer' %>
+        iam-groups: <%= ENV['TEST_KITCHEN_IAM_GROUPS'] %>
         auth-account-arn: arn:aws:iam::236048907885:role/CIPackerProvisioner
         user: <%= ENV['USER'] %>
         <% if ENV['BUILD_URL'] %>
