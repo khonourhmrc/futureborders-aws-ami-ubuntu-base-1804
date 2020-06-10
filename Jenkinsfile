@@ -47,7 +47,7 @@ def RunTest(String TestType){
   stage(TestType) {
     ansiColor('xterm') {
       sh("mkdir -p ${env.BUILD_TARGET}/${TestType}")
-      sh(". ./env.sh && JUNIT_XML=${env.BUILD_TARGET}/${TestType}/${TestType}_test_kitchen.xml TEST_KITCHEN_AMI=\$(cat ${env.BUILD_TARGET}/ami_id.txt) bundle exec kitchen verify ${TestType}")
+      sh(". ./env.sh && TEST_KITCHEN_AMI=\$(cat ${env.BUILD_TARGET}/ami_id.txt) bundle exec kitchen verify ${TestType}")
       if (TestType == 'inspec') {
         archiveArtifacts("${env.BUILD_TARGET}/${TestType}/${TestType}_test_kitchen.xml")
       } else if (TestType == 'cis') {
