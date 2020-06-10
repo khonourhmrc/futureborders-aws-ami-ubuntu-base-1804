@@ -29,7 +29,7 @@ platforms:
         Name: test-kitchen-1804-base
         Env: <%= ENV['AWS_ENVIRONMENT'] %>
         iam-groups: <%= ENV['TEST_KITCHEN_IAM_GROUPS'] || 'webops_engineer' %>
-        auth-account-arn: arn:aws:iam::638924580364:role/RoleCrossAccountSSH
+        auth-account-arn: arn:aws:iam::236048907885:role/CIPackerProvisioner
         user: <%= ENV['USER'] %>
         <% if ENV['BUILD_URL'] %>
         build-url: <%= ENV['BUILD_URL'] %>
