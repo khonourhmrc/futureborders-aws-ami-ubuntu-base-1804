@@ -23,7 +23,7 @@ node ('master') {
     // writeFile(file: "${env.BUILD_TARGET}/ami_id.txt",
     //           text: sh(script: "awk '/^${env.AWS_DEFAULT_REGION}: ami-.{8}/ { print \$2 }' ${env.PACKER_LOG_PATH}",
     //                    returnStdout: true))
-    writeFile(file: "${env.BUILD_TARGET}/ami_id.txt",text: ami-0f3f060af9c63ad75)
+    writeFile(file: "${env.BUILD_TARGET}/ami_id.txt",text: "ami-0f3f060af9c63ad75")
     stash(includes: "${env.BUILD_TARGET}/ami_id.txt", name: 'ami_id')
     sh("cat ${env.BUILD_TARGET}/ami_id.txt")
     archiveArtifacts("${env.BUILD_TARGET}/*")
