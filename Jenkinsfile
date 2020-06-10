@@ -33,11 +33,12 @@ node ('master') {
     sh('nice -n 19 bundle install --deployment --path ${HOME}/.bundler_cache')
     parallel(
       inspec: { RunTest("inspec") },
-      cis: { RunTest("cis") },
-      lynis: { RunTest("lynis") },
+     // cis: { RunTest("cis") },
+     // lynis: { RunTest("lynis") },
     )
   } catch (e) {
     currentBuild.result = 'FAILURE'
+    sh("kitchen diagnose --all")
     throw e
   } finally {
     PostTests()
