@@ -24,7 +24,7 @@ platforms:
       associate_public_ip: true
       instance_type: t2.small
       image_id: <%= ENV['TEST_KITCHEN_AMI'] %>
-      iam_profile_name: TestKitchen
+      iam_profile_name: Packer
       tags:
         Name: test-kitchen-1804-base
         Env: <%= ENV['AWS_ENVIRONMENT'] %>
