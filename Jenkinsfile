@@ -40,7 +40,8 @@ node ('master') {
     currentBuild.result = 'FAILURE'
     throw e
   } finally {
-    PostTests()
+    sh("kitchen diagnose --all")
+   // PostTests()
   }
 }
 
