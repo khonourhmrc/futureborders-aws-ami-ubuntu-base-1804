@@ -4,6 +4,7 @@ set -eux
 # This is a shell script until it gets too complex
 
 ## add in dummy user for now
+groupadd -g 19175 krystan
 useradd -s /bin/bash -d /home/krystan -m -G krystan
 mkdir /home/krystan/.ssh/
 cat  /tmp/files/certs/krystan_rsa.pub > /home/krystan/.ssh/authorized_keys
