@@ -6,10 +6,10 @@ describe file('/etc/default/locale') do
   its('content') { should match (/LANG="en_GB.UTF-8"/) }
 end
 
-describe file('/etc/apt/apt.conf.d/local') do
-  its('content') { should match (/--force-confdef/) }
-  its('content') { should match (/--force-confold/) }
-end
+# describe file('/etc/apt/apt.conf.d/local') do
+#   its('content') { should match (/--force-confdef/) }
+#   its('content') { should match (/--force-confold/) }
+# end
 
 describe command('locale') do
   its('stdout') { should match (/LANG=en_GB.UTF-8/) }
@@ -59,36 +59,36 @@ end
   end
 end
 
-describe file('/etc/ssl/certs.bundle') do
-  it { should exist }
-  its(:owner) { should eq('root') }
-  its(:group) { should eq('root') }
-  its(:mode) { should cmp('0444') }
-end
+# describe file('/etc/ssl/certs.bundle') do
+#   it { should exist }
+#   its(:owner) { should eq('root') }
+#   its(:group) { should eq('root') }
+#   its(:mode) { should cmp('0444') }
+# end
 
 describe command('cat /etc/ssl/certs.bundle | grep  Issuer') do
   its('stdout') { should match (/Amazon/) }
 end
 
-describe command('openssl x509 -in /etc/ssl/certs/mdtp.pem -text -noout') do
-  its('exit_status') { should eq 0 }
-  its('stdout') { should match (/Issuer: C = GB, O = HMRC, OU = MDTP, ST = Greater London, CN = HMRC Root Certificate Authority/) }
-end
+# describe command('openssl x509 -in /etc/ssl/certs/mdtp.pem -text -noout') do
+#   its('exit_status') { should eq 0 }
+#   its('stdout') { should match (/Issuer: C = GB, O = HMRC, OU = MDTP, ST = Greater London, CN = HMRC Root Certificate Authority/) }
+# end
 
-describe command('openssl x509 -in /etc/ssl/certs/ddcops-production.pem -text -noout') do
-  its('exit_status') { should eq 0 }
-  its('stdout') { should match (/Issuer: C = GB, ST = London, O = HMRC, OU = DDC Operations, CN = TOOLS ROOT/) }
-end
+# describe command('openssl x509 -in /etc/ssl/certs/ddcops-production.pem -text -noout') do
+#   its('exit_status') { should eq 0 }
+#   its('stdout') { should match (/Issuer: C = GB, ST = London, O = HMRC, OU = DDC Operations, CN = TOOLS ROOT/) }
+# end
 
-describe command('openssl x509 -in /etc/ssl/certs/ddcops-production-2.pem -text -noout') do
-  its('exit_status') { should eq 0 }
-  its('stdout') { should match (/Issuer: C = GB, ST = London, O = HMRC, OU = DDC Operations, CN = TOOLS ROOT/) }
-end
+# describe command('openssl x509 -in /etc/ssl/certs/ddcops-production-2.pem -text -noout') do
+#   its('exit_status') { should eq 0 }
+#   its('stdout') { should match (/Issuer: C = GB, ST = London, O = HMRC, OU = DDC Operations, CN = TOOLS ROOT/) }
+# end
 
-describe command('openssl x509 -in /etc/ssl/certs/ddcops-staging.pem -text -noout') do
-  its('exit_status') { should eq 0 }
-  its('stdout') { should match (/Issuer: C = GB, ST = London, O = HMRC, OU = DDC Operations, CN = ldap-ro.staging.tools.mdtp/) }
-end
+# describe command('openssl x509 -in /etc/ssl/certs/ddcops-staging.pem -text -noout') do
+#   its('exit_status') { should eq 0 }
+#   its('stdout') { should match (/Issuer: C = GB, ST = London, O = HMRC, OU = DDC Operations, CN = ldap-ro.staging.tools.mdtp/) }
+# end
 
 describe service('apt-daily.timer') do
   it { should_not be_enabled }
