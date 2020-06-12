@@ -7,10 +7,7 @@ driver:
     value: test-kitchen
 
 transport:
-  username: <%= ENV['TEST_KITCHEN_USER'] || 'test-kitchen' %>
-  <% if ENV['TEST_KITCHEN_SSH_KEY'] %>
-  ssh_key: <%= ENV['TEST_KITCHEN_SSH_KEY'] %>
-  <% end %>
+  username: ubuntu
 
 provisioner:
   name: shell
