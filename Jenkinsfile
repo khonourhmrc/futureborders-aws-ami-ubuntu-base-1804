@@ -15,6 +15,8 @@ node ('master') {
     sh('git submodule update --init --remote')
   }
 
+  which bundle
+
   stage('Build') {
     ansiColor('xterm') {
       sh("rm -rf ${env.BUILD_TARGET}/ ; mkdir -p ${env.BUILD_TARGET}")
