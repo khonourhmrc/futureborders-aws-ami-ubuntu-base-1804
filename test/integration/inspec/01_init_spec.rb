@@ -44,21 +44,6 @@ describe command('/usr/bin/pip2 list') do
   its('stdout') { should cmp(/botocore/) }
 end
 
-%w(
-  mdtp
-  ddcops-production
-  ddcops-production-2
-  ddcops-staging
-).each do |cert|
-  describe file("/etc/ssl/certs/#{cert}.pem") do
-    it { should be_symlink }
-    it { should be_linked_to "/usr/local/share/ca-certificates/#{cert}.crt" }
-    its(:owner) { should eq('root') }
-    its(:group) { should eq('root') }
-    its(:mode) { should cmp('0644') }
-  end
-end
-
 # describe file('/etc/ssl/certs.bundle') do
 #   it { should exist }
 #   its(:owner) { should eq('root') }
@@ -66,28 +51,8 @@ end
 #   its(:mode) { should cmp('0444') }
 # end
 
-describe command('cat /etc/ssl/certs.bundle | grep  Issuer') do
-  its('stdout') { should match (/Amazon/) }
-end
-
-# describe command('openssl x509 -in /etc/ssl/certs/mdtp.pem -text -noout') do
-#   its('exit_status') { should eq 0 }
-#   its('stdout') { should match (/Issuer: C = GB, O = HMRC, OU = MDTP, ST = Greater London, CN = HMRC Root Certificate Authority/) }
-# end
-
-# describe command('openssl x509 -in /etc/ssl/certs/ddcops-production.pem -text -noout') do
-#   its('exit_status') { should eq 0 }
-#   its('stdout') { should match (/Issuer: C = GB, ST = London, O = HMRC, OU = DDC Operations, CN = TOOLS ROOT/) }
-# end
-
-# describe command('openssl x509 -in /etc/ssl/certs/ddcops-production-2.pem -text -noout') do
-#   its('exit_status') { should eq 0 }
-#   its('stdout') { should match (/Issuer: C = GB, ST = London, O = HMRC, OU = DDC Operations, CN = TOOLS ROOT/) }
-# end
-
-# describe command('openssl x509 -in /etc/ssl/certs/ddcops-staging.pem -text -noout') do
-#   its('exit_status') { should eq 0 }
-#   its('stdout') { should match (/Issuer: C = GB, ST = London, O = HMRC, OU = DDC Operations, CN = ldap-ro.staging.tools.mdtp/) }
+# describe command('cat /etc/ssl/certs.bundle | grep  Issuer') do
+#   its('stdout') { should match (/Amazon/) }
 # end
 
 describe service('apt-daily.timer') do
