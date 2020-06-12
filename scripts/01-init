@@ -54,7 +54,12 @@ systemctl mask apt-daily.service
 systemctl mask apt-daily.timer
 systemctl daemon-reload
 
+# Add server for apt-boto-s3
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 379CE192D401AB61
+echo deb https://dl.bintray.com/lucidsoftware/apt/ lucid main > /etc/apt/sources.list.d/lucidsoftware-bintray.list
+
 apt-get update
+
 #Prevent debconf: unable to initialize frontend errors
 echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 apt-get -y dist-upgrade
@@ -66,7 +71,8 @@ apt-get install -y \
     python-pip \
     python3 \
     python3-pip \
-    virtualenv
+    virtualenv \
+    apt-boto-s3
 
 # pip2 install --force-reinstall -U pip
 pip2 install --no-cache-dir boto3 botocore
