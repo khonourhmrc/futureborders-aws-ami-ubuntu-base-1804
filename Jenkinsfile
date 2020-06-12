@@ -39,7 +39,7 @@ node ('master') {
     currentBuild.result = 'FAILURE'
     throw e
   } finally {
-    PostTests()
+  //  PostTests()
   }
 }
 
@@ -47,9 +47,8 @@ def RunTest(String TestType){
   stage(TestType) {
     ansiColor('xterm') {
       sh("mkdir -p ${env.BUILD_TARGET}/${TestType}")
-      try {
       sh(". ./env.sh && TEST_KITCHEN_AMI=\$(cat ${env.BUILD_TARGET}/ami_id.txt) bundle exec kitchen verify ${TestType}")
-      } finally {sh("bundle exec kitchen diagnose --all")}
+
       // if (TestType == 'inspec') {
       //   archiveArtifacts("${env.BUILD_TARGET}/${TestType}/${TestType}_test_kitchen.xml")
       // } else if (TestType == 'cis') {
