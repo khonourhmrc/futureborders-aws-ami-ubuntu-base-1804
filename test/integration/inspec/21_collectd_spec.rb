@@ -4,7 +4,7 @@ end
 
 describe package('collectd') do
   it { should be_installed }
-  its('version') { should cmp >= '5.8.5.7.2-2ubuntu1.2' }
+  its('version') { should cmp >= '5.7.2-2ubuntu1.2' }
 end
 
 describe package('sysstat') do
