@@ -16,14 +16,13 @@ node ('master') {
   }
 
   stage('Build') {
-    // ansiColor('xterm') {
-    //   sh("rm -rf ${env.BUILD_TARGET}/ ; mkdir -p ${env.BUILD_TARGET}")
-    //   sh(". ./env.sh && packer build -var-file=jenkins-packervars.json templates/ami-ubuntu-1804-base.json")
-    // }
-    // writeFile(file: "${env.BUILD_TARGET}/ami_id.txt",
-    //           text: sh(script: "awk '/^${env.AWS_DEFAULT_REGION}: ami-.{8}/ { print \$2 }' ${env.PACKER_LOG_PATH}",
-    //                    returnStdout: true))
-    writeFile(file: "${env.BUILD_TARGET}/ami_id.txt",text: "ami-0ccf9843761db46a1")
+    ansiColor('xterm') {
+      sh("rm -rf ${env.BUILD_TARGET}/ ; mkdir -p ${env.BUILD_TARGET}")
+      sh(". ./env.sh && packer build -var-file=jenkins-packervars.json templates/ami-ubuntu-1804-base.json")
+    }
+    writeFile(file: "${env.BUILD_TARGET}/ami_id.txt",
+              text: sh(script: "awk '/^${env.AWS_DEFAULT_REGION}: ami-.{8}/ { print \$2 }' ${env.PACKER_LOG_PATH}",
+                       returnStdout: true))
     stash(includes: "${env.BUILD_TARGET}/ami_id.txt", name: 'ami_id')
     sh("cat ${env.BUILD_TARGET}/ami_id.txt")
     archiveArtifacts("${env.BUILD_TARGET}/*")
