@@ -12,14 +12,14 @@ node ('master') {
   stage('Prepare') {
     step([$class: 'WsCleanup'])
     checkout(scm)
-    sh(". ./setup.sh")
-    sh("which bundle")
     sh('git submodule update --init --remote')
   }
 
-
-
   stage('Build') {
+
+    sh(". ./setup.sh")
+    sh("which bundle")
+
     ansiColor('xterm') {
       sh("rm -rf ${env.BUILD_TARGET}/ ; mkdir -p ${env.BUILD_TARGET}")
       sh(". ./env.sh && packer build -var-file=jenkins-packervars.json templates/ami-ubuntu-1804-base.json")
