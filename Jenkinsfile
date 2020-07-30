@@ -12,10 +12,12 @@ node ('master') {
   stage('Prepare') {
     step([$class: 'WsCleanup'])
     checkout(scm)
+    ./setup.sh
+    which bundle
     sh('git submodule update --init --remote')
   }
 
-  which bundle
+
 
   stage('Build') {
     ansiColor('xterm') {
