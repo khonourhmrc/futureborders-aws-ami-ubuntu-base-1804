@@ -13,7 +13,7 @@ node ('master') {
     step([$class: 'WsCleanup'])
     checkout(scm)
     sh(". ./setup.sh")
-    which bundle
+    sh("which bundle")
     sh('git submodule update --init --remote')
   }
 
