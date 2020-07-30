@@ -18,7 +18,6 @@ node ('master') {
   stage('Build') {
 
     ansiColor('xterm') {
-      sh("ls ./")
       sh(". ./setup.sh")
       sh("which bundle")
       sh("rm -rf ${env.BUILD_TARGET}/ ; mkdir -p ${env.BUILD_TARGET}")
