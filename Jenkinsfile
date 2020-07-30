@@ -17,10 +17,10 @@ node ('master') {
 
   stage('Build') {
 
-    sh(". ./setup.sh")
-    sh("which bundle")
-
     ansiColor('xterm') {
+      sh("ls ./")
+      sh(". ./setup.sh")
+      sh("which bundle")
       sh("rm -rf ${env.BUILD_TARGET}/ ; mkdir -p ${env.BUILD_TARGET}")
       sh(". ./env.sh && packer build -var-file=jenkins-packervars.json templates/ami-ubuntu-1804-base.json")
     }
