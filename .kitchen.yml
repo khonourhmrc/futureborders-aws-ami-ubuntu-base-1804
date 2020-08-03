@@ -5,7 +5,7 @@ driver:
   security_group_filter:
     tag: Name
     value: test-kitchen
-  aws_ssh_key_id: key-02bf21a9f2bcf7d78
+  aws_ssh_key_id: kitcheninspec
 
 transport:
   username: ubuntu
