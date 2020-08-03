@@ -8,7 +8,7 @@ driver:
 
 transport:
   username: ubuntu
-  ssh_key: <%= ENV['TEST_KITCHEN_SSH_KEY'] %>
+  ssh_key: /var/jenkins_home/.ssh/test_kitchen_id_rsa
 
 provisioner:
   name: shell
