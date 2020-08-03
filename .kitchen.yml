@@ -5,10 +5,10 @@ driver:
   security_group_filter:
     tag: Name
     value: test-kitchen
+  aws_ssh_key_id: kitcheninspec
 
 transport:
   username: ubuntu
-  ssh_key: /var/jenkins_home/.ssh/test_kitchen_id_rsa
 
 provisioner:
   name: shell
