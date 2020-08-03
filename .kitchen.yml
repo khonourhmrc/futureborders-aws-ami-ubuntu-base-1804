@@ -9,6 +9,7 @@ driver:
 
 transport:
   username: ubuntu
+  ssh_key: /var/jenkins_home/.ssh/test_kitchen.pem
 
 provisioner:
   name: shell
