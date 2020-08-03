@@ -8,6 +8,7 @@ driver:
 
 transport:
   username: ubuntu
+  ssh_key: <%=['TEST_KITCHEN_SSH_KEY'] %>
 
 provisioner:
   name: shell
