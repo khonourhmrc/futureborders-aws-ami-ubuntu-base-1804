@@ -142,3 +142,14 @@ ln -sf /etc/systemd/system/ready.target /etc/systemd/system/default.target
 
 # Create a collectd group
 groupadd --system collectd
+
+# Enforce default region to eu-west-2 for cli
+echo "[default]" > /root/.aws/config
+echo "region = eu-west2" >> /root/.aws/config
+chmod 755 /root/.aws
+chmod 600 /root/.aws/config
+echo "[default]" > /home/ubuntu/.aws/config
+echo "region = eu-west2" >> /home/ubuntu/.aws/config
+chown -R ubuntu:ubuntu /home/ubuntu/.aws
+chmod 755 /home/ubuntu/.aws
+chmod 600 /home/ubuntu/.aws/config
