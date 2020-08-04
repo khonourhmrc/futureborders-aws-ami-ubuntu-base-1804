@@ -134,7 +134,7 @@ control 'cis-dil-benchmark-5.4.2' do
       end
 
       describe shadow(user.user) do
-        its(:password) { should be_all { |m| m == '*' } }
+        its(:passwords) { should be_all { |m| m == '*' } }
       end
     end
   end
@@ -170,6 +170,7 @@ control 'cis-dil-benchmark-5.4.4' do
   describe.one do
     %w(bash.bashrc profile bashrc).each do |f|
       next unless file("/etc/#{f}").file?
+
       describe file("/etc/#{f}") do
         its(:content) { should match(/^\s*umask [01234567][2367]7\s*(?:#.*)?$/) }
       end

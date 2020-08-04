@@ -64,10 +64,6 @@ control 'cis-dil-benchmark-1.7.1.4' do
   tag cis: 'distribution-independent-linux:1.7.1.4'
   tag level: 1
 
-  only_if do
-    file('/etc/motd').exist?
-  end
-
   describe file('/etc/motd') do
     it { should exist }
     it { should be_readable.by 'owner' }
