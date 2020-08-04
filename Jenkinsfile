@@ -33,7 +33,7 @@ node ('master') {
     sh('nice -n 19 bundle install --deployment --path ${HOME}/.bundler_cache')
     parallel(
       inspec: { RunTest("inspec") },
-     // cis: { RunTest("cis") },
+      cis: { RunTest("cis") },
      // lynis: { RunTest("lynis") },
     )
   } catch (e) {
