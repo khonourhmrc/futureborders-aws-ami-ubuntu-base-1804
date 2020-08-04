@@ -80,6 +80,7 @@ echo "install dccp /bin/false" > /etc/modprobe.d/dccp.conf
 echo "install sctp /bin/false" > /etc/modprobe.d/sctp.conf
 echo "install rds /bin/false" > /etc/modprobe.d/rds.conf
 echo "install tipc /bin/false" > /etc/modprobe.d/tipc.conf
+echo "install vfat /bin/false" > /etc/modprobe.d/vfat.conf
 #rm /lib/modules-load.d/open-iscsi.conf
 
 
