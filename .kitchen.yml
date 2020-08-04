@@ -43,7 +43,7 @@ suites:
       format: junit
       output: <%= ENV['JUNIT_XML'] %>
       <% end %>
-      attributes:
+      inputs:
         cis_level: "1"
 
   - name: inspec
