@@ -83,19 +83,6 @@ echo "install tipc /bin/false" > /etc/modprobe.d/tipc.conf
 echo "install vfat /bin/false" > /etc/modprobe.d/vfat.conf
 #rm /lib/modules-load.d/open-iscsi.conf
 
-# pam.d password changes
-
-rm -rf /etc/pam.d/common-password
-{
-  echo "password        [success=1 default=ignore]      pam_unix.so obscure sha512 remember=5" \
-  ;echo "password        requisite                       pam_deny.so" \
-  ;echo "password        required                        pam_permit.so" \
-  ;echo "password        required                        pam_pwhistory.so           remember=5"
-} >> /etc/pam.d/common-password
-
-chown root:root /etc/pam.d/common-password
-chmod 0644 /etc/pam.d/common-password
-
 #Update initrd with changes
 update-initramfs -k all -u
 # SSH settings
