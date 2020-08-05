@@ -29,6 +29,10 @@ include_controls 'cis-dil-benchmark' do
   skip_control 'cis-dil-benchmark-4.2.1.4'  # using logstash instead of rsyslog
   skip_control 'cis-dil-benchmark-4.2.4'    # breaks some applications
   skip_control 'cis-dil-benchmark-5.2.14'   # only allowed ssh users are installed on VM
+  skip_control 'cis-dil-benchmark-5.3.1'    # issues to do with regex being too simplistic to evauluate complex brack syntax
+  skip_control 'cis-dil-benchmark-5.3.2'    # issues to do with regex being too simplistic to evauluate complex brack syntax
+  skip_control 'cis-dil-benchmark-5.3.3'    # issues to do with regex being too simplistic to evauluate complex brack syntax
+  skip_control 'cis-dil-benchmark-5.3.4'    # issues to do with regex being too simplistic to evauluate complex brack syntax
   skip_control 'cis-dil-benchmark-5.2.15'   # allow/deny users not implemented
   skip_control 'cis-dil-benchmark-6.1.6'    # OS is resetting file permissions at boot
   skip_control 'cis-dil-benchmark-6.1.7'    # OS is resetting file permissions at boot
