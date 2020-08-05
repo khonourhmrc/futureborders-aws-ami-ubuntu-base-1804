@@ -39,21 +39,23 @@ suites:
   - name: cis
     verifier:
       name: inspec
-      <% if ENV['JUNIT_XML'] %>
-      format: junit
-      output: <%= ENV['JUNIT_XML'] %>
-      <% end %>
+      reporter:
+        - cli
+        <% if ENV['BUILD_URL'] %>
+        - junit:<%= ENV['TEST_KITCHEN_XML'] %>
+        <% end %>
       inputs:
         cis_level: "1"
 
   - name: inspec
     verifier:
       name: inspec
-      <% if ENV['JUNIT_XML'] %>
-      format: junit
-      output: <%= ENV['JUNIT_XML'] %>
-      <% end %>
-
+      reporter:
+        - cli
+        <% if ENV['BUILD_URL'] %>
+        - junit:<%= ENV['TEST_KITCHEN_XML'] %>
+        <% end %>
+        
   - name: lynis
     verifier:
       name: shell

@@ -32,9 +32,9 @@ node ('master') {
   try {
     sh('nice -n 19 bundle install --deployment --path ${HOME}/.bundler_cache')
     parallel(
-    //  inspec: { RunTest("inspec") },
+      inspec: { RunTest("inspec") },
       cis: { RunTest("cis") },
-     // lynis: { RunTest("lynis") },
+    //  lynis: { RunTest("lynis") },
     )
   } catch (e) {
     currentBuild.result = 'FAILURE'
@@ -48,16 +48,15 @@ def RunTest(String TestType){
   stage(TestType) {
     ansiColor('xterm') {
       sh("mkdir -p ${env.BUILD_TARGET}/${TestType}")
-      sh(". ./env.sh && TEST_KITCHEN_AMI=\$(cat ${env.BUILD_TARGET}/ami_id.txt) bundle exec kitchen verify ${TestType}")
-
-      // if (TestType == 'inspec') {
-      //   archiveArtifacts("${env.BUILD_TARGET}/${TestType}/${TestType}_test_kitchen.xml")
-      // } else if (TestType == 'cis') {
-      //   archiveArtifacts("${env.BUILD_TARGET}/${TestType}/${TestType}_test_kitchen.xml")
-      // } else if ( TestType == 'lynis' ){
-      //   sh("bundle exec kitchen exec ${TestType} -c 'sudo cat /var/log/lynis.log' > .kitchen/logs/lynis.log")
-      //   sh("bundle exec kitchen exec ${TestType} -c 'sudo cat /var/log/lynis-report.dat' > .kitchen/logs/lynis-report.dat")
-      // }
+      sh(". ./env.sh && JUNIT_XML=${env.BUILD_TARGET}/${TestType}/${TestType}_test_kitchen.xml TEST_KITCHEN_AMI=\$(cat ${env.BUILD_TARGET}/ami_id.txt) bundle exec kitchen verify ${TestType}")
+      if (TestType == 'inspec') {
+        archiveArtifacts("${env.BUILD_TARGET}/${TestType}/${TestType}_test_kitchen.xml")
+      } else if (TestType == 'cis') {
+        archiveArtifacts("${env.BUILD_TARGET}/${TestType}/${TestType}_test_kitchen.xml")
+      } else if ( TestType == 'lynis' ){
+        sh("bundle exec kitchen exec ${TestType} -c 'sudo cat /var/log/lynis.log' > .kitchen/logs/lynis.log")
+        sh("bundle exec kitchen exec ${TestType} -c 'sudo cat /var/log/lynis-report.dat' > .kitchen/logs/lynis-report.dat")
+      }
     }
   }
 }
