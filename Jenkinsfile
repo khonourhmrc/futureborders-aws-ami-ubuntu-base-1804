@@ -34,7 +34,7 @@ node ('master') {
     parallel(
       inspec: { RunTest("inspec") },
       cis: { RunTest("cis") },
-    //  lynis: { RunTest("lynis") },
+      lynis: { RunTest("lynis") },
     )
   } catch (e) {
     currentBuild.result = 'FAILURE'
