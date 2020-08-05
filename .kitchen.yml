@@ -41,8 +41,8 @@ suites:
       name: inspec
       reporter:
         - cli
-        <% if ENV['BUILD_URL'] %>
-        - junit:<%= ENV['TEST_KITCHEN_XML'] %>
+        <% if ENV['JUNIT_XML'] %>
+        - junit:<%= ENV['JUNIT_XML'] %>
         <% end %>
       inputs:
         cis_level: "1"
@@ -52,8 +52,8 @@ suites:
       name: inspec
       reporter:
         - cli
-        <% if ENV['BUILD_URL'] %>
-        - junit:<%= ENV['TEST_KITCHEN_XML'] %>
+        <% if ENV['JUNIT_XML'] %>
+        - junit:<%= ENV['JUNIT_XML'] %>
         <% end %>
         
   - name: lynis
