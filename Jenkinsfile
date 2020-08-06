@@ -136,7 +136,7 @@ def PostTests(){
 
 def generateLaunchPermissionArray() {
   def user_ids = [
-    '236048907885', // Users
+    '236048907885', // Accounts
   ]
 
   def list = ""
