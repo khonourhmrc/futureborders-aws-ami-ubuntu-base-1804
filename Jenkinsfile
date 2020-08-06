@@ -40,7 +40,7 @@ node ('master') {
     currentBuild.result = 'FAILURE'
     throw e
   } finally {
-  //  PostTests()
+    PostTests()
   }
 }
 
