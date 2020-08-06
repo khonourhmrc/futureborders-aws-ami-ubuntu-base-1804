@@ -5,7 +5,7 @@ env.PACKER_LOG = 1
 env.PACKER_LOG_PATH = "${env.BUILD_TARGET}/packer.log"
 env.TEST_KITCHEN_IAM_GROUPS = 'ssh_only'
 env.TEST_KITCHEN_SSH_KEY = '/var/jenkins_home/.ssh/test_kitchen_id_rsa'
-env.BUCKET_NAME = "fbplatform-management-hardening-outputs-c72b38d7-e84b-4963-9dee-5298dcb6710e"
+env.BUCKET_NAME = "fbplatform-shared-management-hardening-output"
 
 //node ('amislave') {
 node ('master') {
