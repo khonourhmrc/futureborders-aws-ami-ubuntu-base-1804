@@ -71,7 +71,7 @@ def PostTests(){
       tags = "\"TagSet=[{Key=status,Value=SUCCESS},{Key=build_number,Value=\${BUILD_NUMBER}},{Key=ami-id,Value=\$(cat ${env.BUILD_TARGET}/ami_id.txt)}]\""
     }
     ansiColor('xterm') {
-      sh("bundle exec kitchen destroy all")
+      sh(". ./env.sh && bundle exec kitchen destroy all")
       // sh("""#!/bin/bash
       //       set -eux
 
