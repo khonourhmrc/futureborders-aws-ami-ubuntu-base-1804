@@ -72,29 +72,29 @@ def PostTests(){
     }
     ansiColor('xterm') {
       sh(". ./env.sh && bundle exec kitchen destroy all")
-      // sh("""#!/bin/bash
-      //       set -eux
+      sh("""#!/bin/bash
+            set -eux
 
-      //       job_date=\$(date \'+%Y-%m-%d_%H:%M\')
-      //       base_directory=\"test_results\"
-      //       ami_id=\$(cat ${env.BUILD_TARGET}/ami_id.txt)
-      //       job_directory=\"${JOB_NAME}/base_\${ami_id}_\$job_date\"
-      //       mkdir -p \$base_directory/\$job_directory
-      //       cp .kitchen/logs/lynis* \$base_directory/\$job_directory
-      //       cp ${env.BUILD_TARGET}/inspec/inspec_test_kitchen.xml \$base_directory/\$job_directory
-      //       cp ${env.BUILD_TARGET}/cis/cis_test_kitchen.xml \$base_directory/\$job_directory
-      //       aws s3 sync \$base_directory s3://${env.BUCKET_NAME}
-      //       s3_objects=\$(aws s3 ls s3://${env.BUCKET_NAME}/\$job_directory/ | awk '{ print \$4 }')
+            job_date=\$(date \'+%Y-%m-%d_%H:%M\')
+            base_directory=\"test_results\"
+            ami_id=\$(cat ${env.BUILD_TARGET}/ami_id.txt)
+            job_directory=\"${JOB_NAME}/base_\${ami_id}_\$job_date\"
+            mkdir -p \$base_directory/\$job_directory
+            cp .kitchen/logs/lynis* \$base_directory/\$job_directory
+            cp ${env.BUILD_TARGET}/inspec/inspec_test_kitchen.xml \$base_directory/\$job_directory
+            cp ${env.BUILD_TARGET}/cis/cis_test_kitchen.xml \$base_directory/\$job_directory
+            aws s3 sync \$base_directory s3://${env.BUCKET_NAME}
+            s3_objects=\$(aws s3 ls s3://${env.BUCKET_NAME}/\$job_directory/ | awk '{ print \$4 }')
 
-      //       if [[ -n "\$s3_objects" ]]; then
-      //         for obj in \$s3_objects; do
-      //           aws s3api put-object-tagging --bucket ${env.BUCKET_NAME} --key \$job_directory/\$obj --tagging ${tags}
-      //         done
-      //       else
-      //         echo "No objects were fetched from S3 - check the output files creation"
-      //         exit 1
-      //       fi
-      //   """)
+            if [[ -n "\$s3_objects" ]]; then
+              for obj in \$s3_objects; do
+                aws s3api put-object-tagging --bucket ${env.BUCKET_NAME} --key \$job_directory/\$obj --tagging ${tags}
+              done
+            else
+              echo "No objects were fetched from S3 - check the output files creation"
+              exit 1
+            fi
+        """)
     }
 }
 
@@ -105,6 +105,7 @@ def PostTests(){
             set -x
             ami_id=\$(cat ${env.BUILD_TARGET}/ami_id.txt)
             snapshot_id=\$(aws ec2 describe-images --image-ids \$ami_id --output text --query 'Images[*].BlockDeviceMappings[*].Ebs.SnapshotId')
+            . ./env.sh
             aws ec2 deregister-image --image-id \$ami_id
             aws ec2 delete-snapshot --snapshot-id \$snapshot_id
          """)
@@ -116,21 +117,21 @@ def PostTests(){
       sh("""#!/bin/bash
             set -x
             ami_id=\$(cat ${env.BUILD_TARGET}/ami_id.txt)
-            aws ec2 create-tags --resource \$ami_id --tags Key=Tests,Value=Passed
+            . ./env.sh aws ec2 create-tags --resource \$ami_id --tags Key=Tests,Value=Passed
          """)
-      sh("aws ec2 modify-image-attribute --image-id \$(cat ${env.BUILD_TARGET}/ami_id.txt) --launch-permission '{\"Add\":[${generateLaunchPermissionArray()}]}'")
+      sh(". ./env.sh && aws ec2 modify-image-attribute --image-id \$(cat ${env.BUILD_TARGET}/ami_id.txt) --launch-permission '{\"Add\":[${generateLaunchPermissionArray()}]}'")
       archiveArtifacts("${env.BUILD_TARGET}/*")
     }
   }
 
-    stage('Sandbox-Tag') {
-      unstash('ami_id')
-      sh """#!/bin/bash
-            ami_id=\$(cat ${env.BUILD_TARGET}/ami_id.txt)
-            sts=( \$(aws --endpoint-url "https://sts.${env.AWS_DEFAULT_REGION}.amazonaws.com" --region ${env.AWS_DEFAULT_REGION} sts assume-role --role-arn \"arn:aws:iam::370807233099:role/iam_jenkins_create_tags\" --role-session-name \"sandbox\" --query \"Credentials.[AccessKeyId,SecretAccessKey,SessionToken]\" --output \"text\") )
-            AWS_ACCESS_KEY_ID=\${sts[0]} AWS_SECRET_ACCESS_KEY=\${sts[1]} AWS_SESSION_TOKEN=\${sts[2]} aws ec2 create-tags --resources \$ami_id --tags Key=Tests,Value=Passed
-        """
-    }
+    // stage('Sandbox-Tag') {
+    //   unstash('ami_id')
+    //   sh """#!/bin/bash
+    //         ami_id=\$(cat ${env.BUILD_TARGET}/ami_id.txt)
+    //         sts=( \$(aws --endpoint-url "https://sts.${env.AWS_DEFAULT_REGION}.amazonaws.com" --region ${env.AWS_DEFAULT_REGION} sts assume-role --role-arn \"arn:aws:iam::370807233099:role/iam_jenkins_create_tags\" --role-session-name \"sandbox\" --query \"Credentials.[AccessKeyId,SecretAccessKey,SessionToken]\" --output \"text\") )
+    //         AWS_ACCESS_KEY_ID=\${sts[0]} AWS_SECRET_ACCESS_KEY=\${sts[1]} AWS_SESSION_TOKEN=\${sts[2]} aws ec2 create-tags --resources \$ami_id --tags Key=Tests,Value=Passed
+    //     """
+    // }
   }
 
 def generateLaunchPermissionArray() {
