@@ -32,9 +32,9 @@ node ('master') {
   try {
     sh('nice -n 19 bundle install --deployment --path ${HOME}/.bundler_cache')
     parallel(
-      inspec: { RunTest("inspec") },
-      cis: { RunTest("cis") },
-      lynis: { RunTest("lynis") },
+      inspec: { RunTest("inspec") }  //,
+      // cis: { RunTest("cis") },
+      // lynis: { RunTest("lynis") },
     )
   } catch (e) {
     currentBuild.result = 'FAILURE'
@@ -71,31 +71,30 @@ def PostTests(){
       tags = "\"TagSet=[{Key=status,Value=SUCCESS},{Key=build_number,Value=\${BUILD_NUMBER}},{Key=ami-id,Value=\$(cat ${env.BUILD_TARGET}/ami_id.txt)}]\""
     }
     ansiColor('xterm') {
-      sh("""#!/bin/bash
-            set -eux
+      sh("bundle exec kitchen destroy all")
+      // sh("""#!/bin/bash
+      //       set -eux
 
-            bundle exec kitchen destroy all
+      //       job_date=\$(date \'+%Y-%m-%d_%H:%M\')
+      //       base_directory=\"test_results\"
+      //       ami_id=\$(cat ${env.BUILD_TARGET}/ami_id.txt)
+      //       job_directory=\"${JOB_NAME}/base_\${ami_id}_\$job_date\"
+      //       mkdir -p \$base_directory/\$job_directory
+      //       cp .kitchen/logs/lynis* \$base_directory/\$job_directory
+      //       cp ${env.BUILD_TARGET}/inspec/inspec_test_kitchen.xml \$base_directory/\$job_directory
+      //       cp ${env.BUILD_TARGET}/cis/cis_test_kitchen.xml \$base_directory/\$job_directory
+      //       aws s3 sync \$base_directory s3://${env.BUCKET_NAME}
+      //       s3_objects=\$(aws s3 ls s3://${env.BUCKET_NAME}/\$job_directory/ | awk '{ print \$4 }')
 
-            job_date=\$(date \'+%Y-%m-%d_%H:%M\')
-            base_directory=\"test_results\"
-            ami_id=\$(cat ${env.BUILD_TARGET}/ami_id.txt)
-            job_directory=\"${JOB_NAME}/base_\${ami_id}_\$job_date\"
-            mkdir -p \$base_directory/\$job_directory
-            cp .kitchen/logs/lynis* \$base_directory/\$job_directory
-            cp ${env.BUILD_TARGET}/inspec/inspec_test_kitchen.xml \$base_directory/\$job_directory
-            cp ${env.BUILD_TARGET}/cis/cis_test_kitchen.xml \$base_directory/\$job_directory
-            aws s3 sync \$base_directory s3://${env.BUCKET_NAME}
-            s3_objects=\$(aws s3 ls s3://${env.BUCKET_NAME}/\$job_directory/ | awk '{ print \$4 }')
-
-            if [[ -n "\$s3_objects" ]]; then
-              for obj in \$s3_objects; do
-                aws s3api put-object-tagging --bucket ${env.BUCKET_NAME} --key \$job_directory/\$obj --tagging ${tags}
-              done
-            else
-              echo "No objects were fetched from S3 - check the output files creation"
-              exit 1
-            fi
-        """)
+      //       if [[ -n "\$s3_objects" ]]; then
+      //         for obj in \$s3_objects; do
+      //           aws s3api put-object-tagging --bucket ${env.BUCKET_NAME} --key \$job_directory/\$obj --tagging ${tags}
+      //         done
+      //       else
+      //         echo "No objects were fetched from S3 - check the output files creation"
+      //         exit 1
+      //       fi
+      //   """)
     }
 }
 
