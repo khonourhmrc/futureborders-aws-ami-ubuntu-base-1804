@@ -82,7 +82,7 @@ def PostTests(){
             mkdir -p \$base_directory/\$job_directory
             cp .kitchen/logs/lynis* \$base_directory/\$job_directory
             cp ${env.BUILD_TARGET}/inspec/inspec_test_kitchen.xml \$base_directory/\$job_directory
-            cp ${env.BUILD_TARGET}/cis/cis_test_kitchen.xml \$base_directory/\$job_directory
+            #cp ${env.BUILD_TARGET}/cis/cis_test_kitchen.xml \$base_directory/\$job_directory
             aws s3 sync \$base_directory s3://${env.BUCKET_NAME}
             s3_objects=\$(aws s3 ls s3://${env.BUCKET_NAME}/\$job_directory/ | awk '{ print \$4 }')
 
