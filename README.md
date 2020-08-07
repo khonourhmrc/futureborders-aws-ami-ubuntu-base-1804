@@ -9,7 +9,28 @@ should be driven by Jenkins.
 
 ### Prepare the environment
 
-You'll need an AWS profile called `webops-sandbox` configured on your machine. Instructions for setting this up can be found in the [aws-users][1] repository.
+You'll need an AWS profile called `devops-sandbox` configured on your machine. 
+
+Your aws config should look this this:
+
+    ...
+
+    [sandbox]
+    region = eu-west-2
+    output = json
+
+    [profile devops-sandbox]
+    role_arn = arn:aws:iam::667236357946:role/PackerProvisioner
+    mfa_serial = arn:aws:iam::667236357946:mfa/devops
+    source_profile = sandbox
+
+Whilst your credentials file like this:
+
+    ...
+
+    [sandbox]
+    aws_access_key_id = access-key-id
+    aws_secret_access_key = secret-access-key
 
 Next step is to get the temporary tokens by sourcing `env.sh` and entering the MFA when asked:
 
