@@ -1,5 +1,6 @@
 # futureborders-aws-ubuntu-base-1804
-# Ubuntu Base AMI
+
+## Introduction
 
 This repo contains the packer and test-kitchen config necessary to build and
 test the Ubuntu Base AMI which all other AMIs are built from. This process
