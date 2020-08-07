@@ -1,5 +1,4 @@
 #!/usr/bin/env groovy
-
 env.BUILD_TARGET = "target"
 env.PACKER_LOG = 1
 env.PACKER_LOG_PATH = "${env.BUILD_TARGET}/packer.log"
@@ -16,11 +15,11 @@ node ('master') {
   }
 
   stage('Build') {
-
     ansiColor('xterm') {
       sh("rm -rf ${env.BUILD_TARGET}/ ; mkdir -p ${env.BUILD_TARGET}")
       sh(". ./env.sh && packer build -var-file=jenkins-packervars.json templates/ami-ubuntu-1804-base.json")
     }
+
     writeFile(file: "${env.BUILD_TARGET}/ami_id.txt",
               text: sh(script: "awk '/^${env.AWS_DEFAULT_REGION}: ami-.{8}/ { print \$2 }' ${env.PACKER_LOG_PATH}",
                        returnStdout: true))
@@ -32,9 +31,9 @@ node ('master') {
   try {
     sh('nice -n 19 bundle install --deployment --path ${HOME}/.bundler_cache')
     parallel(
-      inspec: { RunTest("inspec") }  //,
-      // cis: { RunTest("cis") },
-      // lynis: { RunTest("lynis") },
+      inspec: { RunTest("inspec") },
+      cis: { RunTest("cis") },
+      lynis: { RunTest("lynis") },
     )
   } catch (e) {
     currentBuild.result = 'FAILURE'
@@ -66,10 +65,10 @@ def PostTests(){
     def tags = ""
     if (currentBuild.result == 'FAILURE') {
       tags = "\"TagSet=[{Key=status,Value=FAILURE},{Key=build_number,Value=\${BUILD_NUMBER}}]\""
-    }
-    else {
+    } else {
       tags = "\"TagSet=[{Key=status,Value=SUCCESS},{Key=build_number,Value=\${BUILD_NUMBER}},{Key=ami-id,Value=\$(cat ${env.BUILD_TARGET}/ami_id.txt)}]\""
     }
+
     ansiColor('xterm') {
       sh(". ./env.sh && bundle exec kitchen destroy all")
       sh("""#!/bin/bash
@@ -82,7 +81,7 @@ def PostTests(){
             mkdir -p \$base_directory/\$job_directory
             cp .kitchen/logs/lynis* \$base_directory/\$job_directory
             cp ${env.BUILD_TARGET}/inspec/inspec_test_kitchen.xml \$base_directory/\$job_directory
-            #cp ${env.BUILD_TARGET}/cis/cis_test_kitchen.xml \$base_directory/\$job_directory
+            cp ${env.BUILD_TARGET}/cis/cis_test_kitchen.xml \$base_directory/\$job_directory
            
             # gain privs
             . ./env.sh
@@ -100,7 +99,7 @@ def PostTests(){
             fi
         """)
     }
-}
+  }
 
   if (currentBuild.result == 'FAILURE') {
     stage('Deregister AMI') {
@@ -114,9 +113,7 @@ def PostTests(){
             aws ec2 delete-snapshot --snapshot-id \$snapshot_id
          """)
     }
-}
-
-  else {
+  } else {
     stage('Share AMI') {
       sh("""#!/bin/bash
             set -x
@@ -127,20 +124,18 @@ def PostTests(){
       archiveArtifacts("${env.BUILD_TARGET}/*")
     }
   }
-
-    // stage('Sandbox-Tag') {
-    //   unstash('ami_id')
-    //   sh """#!/bin/bash
-    //         ami_id=\$(cat ${env.BUILD_TARGET}/ami_id.txt)
-    //         sts=( \$(aws --endpoint-url "https://sts.${env.AWS_DEFAULT_REGION}.amazonaws.com" --region ${env.AWS_DEFAULT_REGION} sts assume-role --role-arn \"arn:aws:iam::370807233099:role/iam_jenkins_create_tags\" --role-session-name \"sandbox\" --query \"Credentials.[AccessKeyId,SecretAccessKey,SessionToken]\" --output \"text\") )
-    //         AWS_ACCESS_KEY_ID=\${sts[0]} AWS_SECRET_ACCESS_KEY=\${sts[1]} AWS_SESSION_TOKEN=\${sts[2]} aws ec2 create-tags --resources \$ami_id --tags Key=Tests,Value=Passed
-    //     """
-    // }
-  }
+}
 
 def generateLaunchPermissionArray() {
   def user_ids = [
-    '236048907885', // Accounts
+    '236048907885',
+    '241579122070',
+    '749772925301',
+    '667236357946',
+    '602766993137',
+    '808981689443',
+    '053115678442', 
+    '687289330304'
   ]
 
   def list = ""
@@ -149,3 +144,4 @@ def generateLaunchPermissionArray() {
   }
   return list[0..-2] // delete trailing comma
 }
+
