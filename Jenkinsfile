@@ -73,7 +73,7 @@ def PostTests(){
     ansiColor('xterm') {
       sh(". ./env.sh && bundle exec kitchen destroy all")
       sh("""#!/bin/bash
-            set -eux
+            set -euox
 
             job_date=\$(date \'+%Y-%m-%d_%H:%M\')
             base_directory=\"test_results\"
@@ -83,6 +83,10 @@ def PostTests(){
             cp .kitchen/logs/lynis* \$base_directory/\$job_directory
             cp ${env.BUILD_TARGET}/inspec/inspec_test_kitchen.xml \$base_directory/\$job_directory
             #cp ${env.BUILD_TARGET}/cis/cis_test_kitchen.xml \$base_directory/\$job_directory
+           
+            # gain privs
+            . ./env.sh
+
             aws s3 sync \$base_directory s3://${env.BUCKET_NAME}
             s3_objects=\$(aws s3 ls s3://${env.BUCKET_NAME}/\$job_directory/ | awk '{ print \$4 }')
 
