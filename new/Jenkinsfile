@@ -1,0 +1,102 @@
+pipeline {
+  agent {
+    label "jenkins-py37-ruby-aws-tform"
+  }
+
+  environment {
+    GITHUBTOKEN = credentials('GithubToken')
+    GITHUBSSHKEY = credentials('GithubSSHKey')
+    GITHUBSSHKEYPRIVATE = credentials('GithubSSHKeyPrivate')
+    //TERRAFORM_VERSION = "0.12.26"
+    //TERRAGRUNTVERSION = "0.23.2"
+
+    AWS_ACCESS_KEY_ID = credentials('CIPacker_ACCESS_KEY_SHARED')
+    AWS_SECRET_ACCESS_KEY = credentials('CIPacker_SECRET_ACCESS_KEY_SHARED')
+  }
+  stages {
+    stage('Setup') {
+      when {
+        branch 'master'
+      }
+      steps {
+        container('jenkins-py37-ruby-aws-tform') {
+            sh "./setup.sh"
+        }
+      }
+    }
+    stage('Plan Dev') {
+      when {
+        branch 'master'
+      }
+      environment {
+          ROLE_ARN = credentials('DEV_ROLEARN')
+          TG_ENV_TYPE = "dev"
+      }
+      steps {
+        container('jenkins-py37-ruby-aws-tform') {
+            sh "./plan.sh"
+            script {
+               timeout(time: 1, unit: 'HOURS') {
+                  input id: 'test', message: 'Click on Approve button if you are happy with the plan', ok: 'Approve'
+               }
+            }
+        }
+      }
+    }
+    stage('Deploy to Dev') {
+      when {
+        branch 'master'
+      }
+      environment {
+          ROLE_ARN = credentials('DEV_ROLEARN')
+          TG_ENV_TYPE = "dev"
+      }
+      steps {
+        container('jenkins-py37-ruby-aws-tform') {
+            sh "echo 'Deploy to Dev'"
+            sh "./apply.sh"
+        }
+      }
+    }
+
+    stage('Plan Test') {
+      when {
+        branch 'master'
+      }
+      environment {
+          ROLE_ARN = credentials('TEST_ROLEARN')
+          TG_ENV_TYPE = "test"
+      }
+      steps {
+        container('jenkins-py37-ruby-aws-tform') {
+            sh "./plan.sh"
+            script {
+                timeout(time: 1, unit: 'HOURS') {
+                  input id: 'test', message: 'Click on Approve button if you are happy with the plan', ok: 'Approve'
+                }
+            }
+        }
+      }
+    }
+    stage('Deploy to Test') {
+      when {
+        branch 'master'
+      }
+      environment {
+          ROLE_ARN = credentials('TEST_ROLEARN')
+          TG_ENV_TYPE = "test"
+      }
+      steps {
+        container('jenkins-py37-ruby-aws-tform') {
+            sh "echo 'Deploy to Test'"
+            sh "./apply.sh"
+        }
+      }
+    }
+  }
+  post {
+    always {
+      cleanWs()
+    }
+  }
+}
